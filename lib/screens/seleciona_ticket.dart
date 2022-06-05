@@ -131,7 +131,7 @@ class _seleciona_ticketState extends State<seleciona_ticket> {
                     TextField(
                       onChanged: (text) {
                         placaDoVeiculo = text;
-                        placaDoVeiculo.toUpperCase();
+                        placaDoVeiculo = placaDoVeiculo.toUpperCase();
                       },
                       inputFormatters: [
                         FilteringTextInputFormatter.deny(RegExp(r'[/\\-]')),
