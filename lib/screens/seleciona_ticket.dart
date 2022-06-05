@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:modulo_cidadao/screens/metodosPagamento.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:modulo_cidadao/Model/notification_service.dart';
@@ -45,6 +46,28 @@ class _seleciona_ticketState extends State<seleciona_ticket> {
 
   int valorDoTicket = 2;
 
+  bool isValid(){
+    if (placaDoVeiculo.length == 7 && cpf.length == 11) {
+      print(placaDoVeiculo.length);
+      print(cpf.length);
+      print(cnpj.length);
+      return true;
+    } else if (placaDoVeiculo.length == 7 && cnpj.length == 14){
+      print(placaDoVeiculo.length);
+      print(cpf.length);
+      print(cnpj.length);
+      return true;
+    } else {
+      print(placaDoVeiculo.length);
+      print(cpf.length);
+      print(cnpj.length);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Digite corretamente todos os campos a cima!'),
+      ));
+      return false;
+    }
+  }
+
   int _calculaValorTicket(){
     if (_counter == 1) {
       valorDoTicket = 2;
@@ -84,6 +107,8 @@ class _seleciona_ticketState extends State<seleciona_ticket> {
           centerTitle: true,
         ),
         body: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(32),
           child: Column(
             children: [
               Card(
@@ -106,7 +131,11 @@ class _seleciona_ticketState extends State<seleciona_ticket> {
                     TextField(
                       onChanged: (text) {
                         placaDoVeiculo = text;
+                        placaDoVeiculo.toUpperCase();
                       },
+                      inputFormatters: [
+                        FilteringTextInputFormatter.deny(RegExp(r'[/\\-]')),
+                      ],
                       obscureText: false,
                       decoration: const InputDecoration(
                         labelText: 'Placa do Veículo',
@@ -120,6 +149,9 @@ class _seleciona_ticketState extends State<seleciona_ticket> {
                       onChanged: (text) {
                         cpf = text;
                       },
+                      inputFormatters: [
+                        FilteringTextInputFormatter.deny(RegExp(r'[/\\-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]')),
+                      ],
                       obscureText: false,
                       decoration: InputDecoration(
                         labelText: 'CPF',
@@ -129,6 +161,9 @@ class _seleciona_ticketState extends State<seleciona_ticket> {
                       onChanged: (text) {
                         cnpj = text;
                       },
+                      inputFormatters: [
+                        FilteringTextInputFormatter.deny(RegExp(r'[/\\-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]')),
+                      ],
                       obscureText: false,
                       decoration: InputDecoration(
                         labelText: 'CNPJ',
@@ -195,25 +230,28 @@ class _seleciona_ticketState extends State<seleciona_ticket> {
                     child: Text('Realizar Pagamento'),
                     onPressed: (){
                       _calculaValorTicket();
-                      if (placaDoVeiculo == '') {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('Digite a placa do carro!'),
-                        ));
-                      } else if (cpf == '' && cnpj == '') {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('Digite, pelo menos, o CPF ou CNPJ!'),
-                        ));
-                      } else {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => metodosPagamento(valorDoTicket, _counter, placaDoVeiculo, widget.zonaAzulComerciosNomes, widget.zonaAzulComerciosNomes2)),
-                        );
+                      if (isValid() == true) {
+                        if (placaDoVeiculo == '') {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                            content: Text('Digite a placa do carro!'),
+                          ));
+                        } else if (cpf == '' && cnpj == '') {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                            content: Text('Digite, pelo menos, o CPF ou CNPJ!'),
+                          ));
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context) => metodosPagamento(valorDoTicket, _counter, placaDoVeiculo, widget.zonaAzulComerciosNomes, widget.zonaAzulComerciosNomes2)),
+                          );
+                        }
                       }
                     },
                   )
-              )
+              ),
             ],
-          )
-        )
+          ),
+          ),
+        ),
     );
 
   }
