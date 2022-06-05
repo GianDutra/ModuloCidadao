@@ -50,6 +50,15 @@ class _credit_card_pageState extends State<credit_card_page> {
       return resp.data["status"];
     }
 
+    Future<void> insertTicket(String placaDoVeiculo) async {
+      HttpsCallable callable = FirebaseFunctions.instanceFor(region: "southamerica-east1").httpsCallable('addNewTicket');
+      final resp = await callable.call(<String, dynamic>{
+        'placaVeiculo': placaDoVeiculo,
+        'estadia': widget._counter
+      });
+      print("result: ${resp.data}");
+    }
+
 
     return Scaffold(
       backgroundColor: Colors.teal[50],
@@ -128,6 +137,7 @@ class _credit_card_pageState extends State<credit_card_page> {
                               print(paymentResult);
                               print('valid');
                               if (paymentResult == 'TRANSACAO_EFETUADA'){
+                                insertTicket(widget.placaDoVeiculo);
                                 final AlertDialog infoTicket = AlertDialog(
                                   title: Text('Pagamento Efetuado!',
                                     textAlign: TextAlign.center,),
